@@ -328,9 +328,7 @@ class Game:
 
         if self.has_set_high_score:
             if self.highscores.ready_to_save:
-                self.highscores.save_new(
-                    self.highscores.highscore_name, self.score
-                )
+                self.highscores.save_new(self.highscores.highscore_name, self.score)
                 go_to_menu = True
             else:
                 if pyxel.btnp(pyxel.KEY_UP):

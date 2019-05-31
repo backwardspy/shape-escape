@@ -8,10 +8,12 @@ class ObjectPool:
     """
     ObjectPool is a data structure that grows to fit a set of objects.
     """
+
     class Object:
         """
         Object is a simple wrapper around a value.
         """
+
         def __init__(self, value):
             self.value = value
             self.alive = True
@@ -53,6 +55,7 @@ class Particle:
     Life is how long (in frames) the particle should live for.
     Age is how old (in frames) the particle is.
     """
+
     def __init__(self, x, y, vx, vy, life):
         self.x = x
         self.y = y
@@ -78,7 +81,9 @@ class Particle:
         """
         You can draw anything in here. I'm using circles, but particles can be sprites, text, et cetera.
         """
-        colour = 7 - int(3 * self.age / self.life)  # Pick white/grey/dark-grey based on age.
+        colour = 7 - int(
+            3 * self.age / self.life
+        )  # Pick white/grey/dark-grey based on age.
         pyxel.circ(self.x, self.y, 1, colour)
 
 
