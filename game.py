@@ -17,6 +17,9 @@ MENU_COLOUR_CYCLE_BASE = [6, 13, 5, 1]
 MENU_COLOUR_CYCLE = [6, 13, 5, 1, 5, 13]
 MENU_COLOUR_CYCLE_LEN = len(MENU_COLOUR_CYCLE)
 
+MUSIC_MENU = 1
+MUSIC_GAME = 0
+
 
 def btni(key):
     return 1 if pyxel.btn(key) else 0
@@ -153,7 +156,7 @@ class Game:
         self.state = self.MENU
         self.reset()
 
-        pyxel.playm(0, loop=True)
+        pyxel.playm(MUSIC_MENU, loop=True)
 
     def reset(self):
         pyxel.pal()  # reset the palette after cycling
@@ -255,6 +258,7 @@ class Game:
         if pyxel.btnp(pyxel.KEY_SPACE):
             self.state = self.GAME
             self.reset()
+            pyxel.playm(MUSIC_GAME, loop=True)
 
     def update_game(self):
         self.difficulty = self.difficulty_timer / self.difficulty_duration
@@ -345,7 +349,7 @@ class Game:
             self.state = self.MENU
             self.reset()
             self.reset_score()
-            pyxel.playm(0, loop=True)
+            pyxel.playm(MUSIC_MENU, loop=True)
 
     def draw_shape(self, shape, arc, angle):
         a = arc * shape.segment + angle
