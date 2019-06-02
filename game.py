@@ -4,7 +4,7 @@ import sys
 
 import pyxel
 
-from highscores import Highscores
+import highscores
 
 W = 256
 H = 256
@@ -161,7 +161,7 @@ class Game:
     def reset(self):
         pyxel.pal()  # reset the palette after cycling
 
-        self.highscores = Highscores("highscores")
+        self.highscores = highscores.Highscores("highscores")
         self.high_score = self.highscores.ordered_score_list()[0]["score"]
 
         self.shapes = ObjectPool()
@@ -340,7 +340,9 @@ class Game:
                 elif pyxel.btnp(pyxel.KEY_DOWN):
                     self.highscores.alphabet_direction = -1
                 elif pyxel.btnp(pyxel.KEY_RIGHT):
-                    self.highscores.move_to_next = True
+                    self.highscores.move_direction = 1
+                elif pyxel.btnp(pyxel.KEY_LEFT):
+                    self.highscores.move_direction = -1
                 self.highscores.update()
         elif pyxel.btnp(pyxel.KEY_SPACE):
             go_to_menu = True
@@ -462,6 +464,16 @@ class Game:
             pyxel.text(W // 2 - 28, H // 2 - 64, "new high score!", 7)
             pyxel.text(W // 2 - 20, H // 2 - 48, "ENTER NAME", 7)
             pyxel.text(W // 2 - 20, H // 2 - 32, self.highscores.highscore_name, 8)
+            pyxel.blt(
+                W // 2 - 20 + self.highscores.active_letter * 4,
+                H // 2 - 26,
+                0,
+                8,
+                0,
+                3,
+                2,
+                0,
+            )
         else:
             pyxel.text(W // 2 - 56, H // 2 - 24, "push space to return to menu", 7)
 
@@ -471,9 +483,9 @@ class Game:
         pyxel.text(W // 2 - 24, H // 2, "HIGH SCORES", 7)
         for i, score in enumerate(self.highscores.ordered_score_list()):
             pyxel.text(
-                W // 2 - 28,
+                W // 2 - 48,
                 H // 2 + 8 + i * 8,
-                f"{score['name']} ... {score['score']}",
+                f"{score['name']: <{highscores.MAX_LETTERS}} .. {score['score']:012}",
                 7,
             )
 

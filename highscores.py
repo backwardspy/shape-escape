@@ -1,8 +1,10 @@
 import json
 import string
 
-ALPHABET = string.ascii_uppercase
-DEFAULT_NAME = "___"
+ALPHABET = string.ascii_uppercase + " "
+MAX_ENTRIES = 10
+MAX_LETTERS = 9
+DEFAULT_NAME = "_" * MAX_LETTERS
 
 
 class Highscores:
@@ -14,8 +16,8 @@ class Highscores:
         self.highscore_name = DEFAULT_NAME
         self.active_letter = 0
         self.ready_to_save = False
-        self.move_to_next = False
         self.alphabet_direction = 0
+        self.move_direction = 0
         self.alphabet_index = -1
 
     def load_highscores(self):
@@ -39,36 +41,42 @@ class Highscores:
         return any(score > highscore for highscore in current_highscores)
 
     def ordered_score_list(self):
-        scores = sorted(self.score_list, key=lambda k: k["score"], reverse=True)[:10]
-        if len(scores) < 10:
-            scores.extend([dict(score=0, name="***")] * (10 - len(scores)))
+        scores = sorted(self.score_list, key=lambda k: k["score"], reverse=True)[
+            :MAX_ENTRIES
+        ]
+        if len(scores) < MAX_ENTRIES:
+            scores.extend([dict(score=0, name="***")] * (MAX_ENTRIES - len(scores)))
         return scores
 
     def update(self):
-        if self.active_letter > 2:
+        if self.active_letter >= MAX_LETTERS:
             self.ready_to_save = True
             return
 
-        if self.move_to_next:
+        if self.move_direction > 0:
             if not self.highscore_name[self.active_letter] == "_":
                 self.alphabet_index = -1
                 self.active_letter += 1
-
-            self.move_to_next = False
+            self.move_direction = 0
+            return
+        elif self.move_direction < 0:
+            if self.active_letter > 0:
+                self.active_letter -= 1
+                self.alphabet_index = ALPHABET.index(
+                    self.highscore_name[self.active_letter]
+                )
+            self.move_direction = 0
             return
 
         if self.alphabet_direction == 0:
             return
 
         if self.alphabet_direction > 0:
-            self.alphabet_index += 1
-            if self.alphabet_index > 25:
-                self.alphabet_index = 0
-
-        if self.alphabet_direction < 0:
+            self.alphabet_index = (self.alphabet_index + 1) % len(ALPHABET)
+        elif self.alphabet_direction < 0:
             self.alphabet_index -= 1
             if self.alphabet_index < 0:
-                self.alphabet_index = 25
+                self.alphabet_index = len(ALPHABET) - 1
 
         self.alphabet_direction = 0
         selected_letter = ALPHABET[self.alphabet_index]
