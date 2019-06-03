@@ -9,7 +9,6 @@ from engine.constants import W, H
 ALPHABET = string.ascii_uppercase + " "
 MAX_ENTRIES = 10
 MAX_LETTERS = 9
-DEFAULT_NAME = "_" * MAX_LETTERS
 
 
 class Highscores:
@@ -17,13 +16,13 @@ class Highscores:
         self.highscore_filepath = highscore_filepath
         self.score_list = []
         self.load_highscores()
-        self.needs_updating = False
-        self.highscore_name = DEFAULT_NAME
+        self.name_letters = [" "] * MAX_LETTERS
         self.active_letter = 0
-        self.ready_to_save = False
-        self.alphabet_direction = 0
-        self.move_direction = 0
         self.alphabet_index = -1
+
+    @property
+    def name(self):
+        return "".join(self.name_letters)
 
     def load_highscores(self):
         try:
@@ -32,74 +31,58 @@ class Highscores:
         except FileNotFoundError:
             self.score_list = []
 
-        self.needs_updating = False
-
-    def save_new(self, name, score):
+    def _save_new(self, name, score):
         new_highscore = {"name": name, "score": score}
         self.score_list.append(new_highscore)
-        self.score_list = self.ordered_score_list()
+        self.score_list = self.ordered_score_list(include_placeholders=False)
         with open(self.highscore_filepath, "w") as highscore_file:
-            json.dump(self.score_list, highscore_file, indent=4)
+            json.dump(self.score_list, highscore_file)
 
     def check_highscores(self, score):
         current_highscores = [x["score"] for x in self.score_list]
         return any(score > highscore for highscore in current_highscores)
 
-    def ordered_score_list(self):
+    def ordered_score_list(self, *, include_placeholders=True):
         scores = sorted(self.score_list, key=lambda k: k["score"], reverse=True)[
             :MAX_ENTRIES
         ]
-        if len(scores) < MAX_ENTRIES:
-            scores.extend([dict(score=0, name="***")] * (MAX_ENTRIES - len(scores)))
+        if include_placeholders and len(scores) < MAX_ENTRIES:
+            scores.extend([None] * (MAX_ENTRIES - len(scores)))
         return scores
 
-    def update(self):
-        if self.active_letter >= MAX_LETTERS:
-            self.ready_to_save = True
+    def up(self):
+        self.alphabet_index = (self.alphabet_index + 1) % len(ALPHABET)
+        self.name_letters[self.active_letter] = ALPHABET[self.alphabet_index]
+
+    def down(self):
+        self.alphabet_index -= 1
+        if self.alphabet_index < 0:
+            self.alphabet_index = len(ALPHABET) - 1
+        self.name_letters[self.active_letter] = ALPHABET[self.alphabet_index]
+
+    def left(self):
+        if self.active_letter > 0:
+            self.active_letter -= 1
+            self.alphabet_index = ALPHABET.index(self.name_letters[self.active_letter])
+
+    def right(self):
+        if self.active_letter < MAX_LETTERS - 1:
+            self.active_letter += 1
+            self.alphabet_index = ALPHABET.index(self.name_letters[self.active_letter])
+
+    def enter(self, score):
+        if all(l == " " for l in self.name_letters):
             return
-
-        if self.move_direction > 0:
-            if not self.highscore_name[self.active_letter] == "_":
-                self.alphabet_index = -1
-                self.active_letter += 1
-            self.move_direction = 0
-            return
-        elif self.move_direction < 0:
-            if self.active_letter > 0:
-                self.active_letter -= 1
-                self.alphabet_index = ALPHABET.index(
-                    self.highscore_name[self.active_letter]
-                )
-            self.move_direction = 0
-            return
-
-        if self.alphabet_direction == 0:
-            return
-
-        if self.alphabet_direction > 0:
-            self.alphabet_index = (self.alphabet_index + 1) % len(ALPHABET)
-        elif self.alphabet_direction < 0:
-            self.alphabet_index -= 1
-            if self.alphabet_index < 0:
-                self.alphabet_index = len(ALPHABET) - 1
-
-        self.alphabet_direction = 0
-        selected_letter = ALPHABET[self.alphabet_index]
-        name = self.highscore_name
-        new_name = (
-            name[: self.active_letter]
-            + selected_letter
-            + name[self.active_letter + 1 :]
-        )
-
-        self.highscore_name = new_name
+        self._save_new(self.name, score)
 
     def draw(self):
         pyxel.text(W // 2 - 24, H // 2, "HIGH SCORES", 7)
+        x = W // 2 - 48
         for i, score in enumerate(self.ordered_score_list()):
-            pyxel.text(
-                W // 2 - 48,
-                H // 2 + 8 + i * 8,
-                f"{score['name']: <{MAX_LETTERS}} .. {score['score']:012}",
-                7,
-            )
+            y = H // 2 + (i + 1) * 8
+            if score is not None:
+                pyxel.text(
+                    x, y, f"{score['name']: <{MAX_LETTERS}} .. {score['score']:012}", 7
+                )
+            else:
+                pyxel.text(x, y, "- - - - - - - - - - - - -", 7)

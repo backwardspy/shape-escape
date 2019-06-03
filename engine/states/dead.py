@@ -5,27 +5,26 @@ from engine.constants import STATE_MENU, W, H
 
 
 class DeadState:
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        pass
+
     def update(self):
-        go_to_menu = False
-
         if state.has_set_high_score:
-            if state.scoreboard.ready_to_save:
-                state.scoreboard.save_new(state.scoreboard.highscore_name, state.score)
-                go_to_menu = True
-            else:
-                if pyxel.btnp(pyxel.KEY_UP):
-                    state.scoreboard.alphabet_direction = 1
-                elif pyxel.btnp(pyxel.KEY_DOWN):
-                    state.scoreboard.alphabet_direction = -1
-                elif pyxel.btnp(pyxel.KEY_RIGHT):
-                    state.scoreboard.move_direction = 1
-                elif pyxel.btnp(pyxel.KEY_LEFT):
-                    state.scoreboard.move_direction = -1
-                state.scoreboard.update()
+            if pyxel.btnp(pyxel.KEY_UP):
+                state.scoreboard.up()
+            elif pyxel.btnp(pyxel.KEY_DOWN):
+                state.scoreboard.down()
+            elif pyxel.btnp(pyxel.KEY_RIGHT):
+                state.scoreboard.right()
+            elif pyxel.btnp(pyxel.KEY_LEFT):
+                state.scoreboard.left()
+            elif pyxel.btnp(pyxel.KEY_SPACE):
+                state.scoreboard.enter(state.score)
+                state.game.set_state(STATE_MENU)
         elif pyxel.btnp(pyxel.KEY_SPACE):
-            go_to_menu = True
-
-        if go_to_menu:
             state.game.set_state(STATE_MENU)
 
     def draw(self):
@@ -39,16 +38,18 @@ class DeadState:
         if state.has_set_high_score:
             pyxel.text(W // 2 - 28, H // 2 - 64, "new high score!", 7)
             pyxel.text(W // 2 - 20, H // 2 - 48, "ENTER NAME", 7)
-            pyxel.text(W // 2 - 20, H // 2 - 32, state.scoreboard.highscore_name, 8)
+            pyxel.text(W // 2 - 20, H // 2 - 32, state.scoreboard.name, 8)
+
+            start_x = W // 2 - 20
+            top_y = H // 2 - 36
+            bottom_y = top_y + 10
             for i in range(0, highscores.MAX_LETTERS):
-                x = W // 2 - 20 + i * 4
-                top_y = H // 2 - 36
-                bottom_y = top_y + 10
-                if i == state.scoreboard.active_letter:
-                    pyxel.blt(x, top_y, 0, 8, 0, 3, 2, 0)
-                    pyxel.blt(x, bottom_y, 0, 11, 0, 3, 2, 0)
-                else:
-                    pyxel.blt(x, bottom_y, 0, 8, 4, 3, 1, 0)
+                if state.scoreboard.name_letters[i] == " ":
+                    pyxel.blt(start_x + i * 4, bottom_y - 2, 0, 8, 3, 3, 1, 0)
+
+            active_x = start_x + state.scoreboard.active_letter * 4
+            pyxel.blt(active_x, top_y, 0, 8, 0, 3, 2, 0)
+            pyxel.blt(active_x, bottom_y, 0, 11, 0, 3, 2, 0)
         else:
             pyxel.text(W // 2 - 56, H // 2 - 24, "push space to return to menu", 7)
 
