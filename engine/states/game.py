@@ -39,8 +39,8 @@ class GameState:
 
         self.last_segment = 0
 
-        self.start_spawn_interval = 3 * 60  # frames
-        self.end_spawn_interval = 45
+        self.start_spawn_interval = 180  # frames
+        self.end_spawn_interval = 35
         self.spawn_timer = 0
 
         self.speed = 1  # pixel/frame
@@ -99,7 +99,7 @@ class GameState:
             pyxel.stop()
             pyxel.play(3, 1)
             if state.scoreboard.check_highscores(state.score):
-                self.has_set_high_score = True
+                state.has_set_high_score = True
             state.game.set_state(STATE_DEAD)
             return
         elif scored:
@@ -186,10 +186,22 @@ class GameState:
         seg = rand(0, self.segments - 1)
         thickness = 8
         colour = rand(8, 12)
-        n_segments = rand(3, self.segments - 1)
-        for i in range(n_segments):
+
+        def add(i):
             si = (seg + i) % self.segments
             self.shapes.insert(Shape(si, 256, thickness, colour))
+
+        shape_type = rand(0, 5)
+        if shape_type == 0:
+            for i in range(0, self.segments, 2):
+                add(i)
+        elif shape_type == 1:
+            for i in range(0, self.segments, 3):
+                add(i)
+        else:
+            n_segments = rand(2, self.segments - 1)
+            for i in range(n_segments):
+                add(i)
 
     def increment_score(self):
         points = int(250 * (2 ** (self.difficulty * 3)))
@@ -211,5 +223,5 @@ class GameState:
 
         self.cam_punch = 5
         self.rotation_speed = -sgnz(self.rotation_speed) * (
-            0.005 + randf() * self.difficulty * 0.05
+            0.001 + randf() * self.difficulty * 0.05
         )

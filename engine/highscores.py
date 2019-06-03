@@ -34,20 +34,20 @@ class Highscores:
     def _save_new(self, name, score):
         new_highscore = {"name": name, "score": score}
         self.score_list.append(new_highscore)
-        self.score_list = self.ordered_score_list(include_placeholders=False)
+        self.score_list = self.ordered_score_list()
         with open(self.highscore_filepath, "w") as highscore_file:
             json.dump(self.score_list, highscore_file)
 
     def check_highscores(self, score):
-        current_highscores = [x["score"] for x in self.score_list]
+        current_highscores = [x["score"] for x in self.ordered_score_list()]
         return any(score > highscore for highscore in current_highscores)
 
-    def ordered_score_list(self, *, include_placeholders=True):
-        scores = sorted(self.score_list, key=lambda k: k["score"], reverse=True)[
-            :MAX_ENTRIES
+    def ordered_score_list(self):
+        scores = self.score_list + [
+            {"score": 1000 * i, "name": "JEFFBEZOS"}
+            for i in range(1, MAX_ENTRIES - len(self.score_list))
         ]
-        if include_placeholders and len(scores) < MAX_ENTRIES:
-            scores.extend([None] * (MAX_ENTRIES - len(scores)))
+        scores = sorted(scores, key=lambda k: k["score"], reverse=True)[:MAX_ENTRIES]
         return scores
 
     def up(self):
