@@ -22,7 +22,10 @@ class GameState:
         pyxel.pal()
         pyxel.playm(MUSIC_GAME, loop=True)
 
-        state.high_score = state.scoreboard.ordered_score_list()[0]["score"]
+        try:
+            state.high_score = state.scoreboard.ordered_score_list()[0]["score"]
+        except TypeError:
+            state.high_score = 0
         state.has_set_high_score = False
         state.score = 0
         self.display_score = 0
