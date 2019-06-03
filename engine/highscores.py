@@ -1,6 +1,11 @@
 import json
 import string
 
+import pyxel
+
+from engine.constants import W, H
+
+
 ALPHABET = string.ascii_uppercase + " "
 MAX_ENTRIES = 10
 MAX_LETTERS = 9
@@ -88,3 +93,13 @@ class Highscores:
         )
 
         self.highscore_name = new_name
+
+    def draw(self):
+        pyxel.text(W // 2 - 24, H // 2, "HIGH SCORES", 7)
+        for i, score in enumerate(self.ordered_score_list()):
+            pyxel.text(
+                W // 2 - 48,
+                H // 2 + 8 + i * 8,
+                f"{score['name']: <{MAX_LETTERS}} .. {score['score']:012}",
+                7,
+            )
