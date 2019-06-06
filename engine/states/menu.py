@@ -1,6 +1,6 @@
 import pyxel
 
-from engine.constants import W, H, MUSIC_MENU, STATE_GAME
+from engine.constants import W, H, MUSIC_MENU, STATE_GAME, GAMEPAD_1_A
 from engine import state
 
 TEXT = "push space to begin"
@@ -32,7 +32,7 @@ class MenuState:
                     colour, COLOUR_CYCLE[(self.palette_cycle + i) % COLOUR_CYCLE_LEN]
                 )
 
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(GAMEPAD_1_A):
             state.game.set_state(STATE_GAME)
 
     def draw(self):
