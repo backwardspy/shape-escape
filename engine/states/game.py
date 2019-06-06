@@ -7,8 +7,8 @@ from engine import state
 from engine.object_pool import ObjectPool
 from engine.shape import Shape
 from engine.particles import Particle, TextParticle
-from engine.constants import W, H, STATE_DEAD
-from engine.utils import sgnz, lerpi, wrap_ang, btni
+from engine.constants import W, H, STATE_DEAD, GAMEPAD_1_LEFT, GAMEPAD_1_RIGHT
+from engine.utils import sgn, sgnz, lerpi, wrap_ang, btni
 
 
 MUSIC_GAME = 0
@@ -110,8 +110,10 @@ class GameState:
         if self.rotation > math.tau:
             self.rotation -= math.tau
 
+        right = sgn(btni(pyxel.KEY_RIGHT) + btni(GAMEPAD_1_RIGHT))
+        left = sgn(btni(pyxel.KEY_LEFT) + btni(GAMEPAD_1_LEFT))
         self.player_ang = wrap_ang(
-            self.player_ang + (btni(pyxel.KEY_RIGHT) - btni(pyxel.KEY_LEFT)) * 0.1
+            self.player_ang + (right - left) * 0.1
         )
 
         for i, sp in self.score_particles.each():
