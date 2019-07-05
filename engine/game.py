@@ -11,7 +11,7 @@ from engine.states import MenuState, GameState, DeadState
 class Game:
     def __init__(self):
         pyxel.init(W - 1, H - 1, caption="Shape Escape", fps=60)
-        pyxel.load("assets.pyxel")
+        pyxel.load("../assets.pyxres")
 
         self.state = MenuState()
 
