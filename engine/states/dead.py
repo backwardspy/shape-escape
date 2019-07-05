@@ -1,7 +1,7 @@
 import pyxel
 
 from engine import state, highscores
-from engine.constants import STATE_MENU, W, H, GAMEPAD_1_UP, GAMEPAD_1_DOWN, GAMEPAD_1_LEFT, GAMEPAD_1_RIGHT, GAMEPAD_1_A
+from engine.constants import STATE_MENU, W, H
 
 
 class DeadState:
@@ -13,18 +13,18 @@ class DeadState:
 
     def update(self):
         if state.has_set_high_score:
-            if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(GAMEPAD_1_UP):
+            if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.GAMEPAD_1_UP):
                 state.scoreboard.up()
-            elif pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(GAMEPAD_1_DOWN):
+            elif pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.GAMEPAD_1_DOWN):
                 state.scoreboard.down()
-            elif pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(GAMEPAD_1_RIGHT):
+            elif pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.GAMEPAD_1_RIGHT):
                 state.scoreboard.right()
-            elif pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(GAMEPAD_1_LEFT):
+            elif pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.GAMEPAD_1_LEFT):
                 state.scoreboard.left()
-            elif pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(GAMEPAD_1_A):
+            elif pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD_1_A):
                 state.scoreboard.enter(state.score)
                 state.game.set_state(STATE_MENU)
-        elif pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(GAMEPAD_1_A):
+        elif pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD_1_A):
             state.game.set_state(STATE_MENU)
 
     def draw(self):
